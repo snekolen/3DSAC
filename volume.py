@@ -6,41 +6,38 @@ import time
 def calcVectors(speakers, userLoc, volume): #Speaker obj, int arr[x, y, z], int
     relVecs = [] #For both speakers
     volume *= 0.01
+    vecTot = 0
 
-    #Creates vectors for both speakers
+    #Creates difference for each speakers
     for s in speakers:
         sLoc = s.getLocation()
         relVecs.append([userLoc[0] - sLoc[0], userLoc[1] - sLoc[1], userLoc[2] - sLoc[2]])
     
     #Creates volume vectors
-    netVecs = []
-    volVecs = [[], []]
-    for i in range(0, 2):
+    netVecs = [] #Net vectors based on distance
+    volVecs = []
+    
+    for i in range(0, len(speakers)):
         netVol = ((relVecs[i][0])**2 + (relVecs[i][1])**2 + (relVecs[i][2])**2) ** (1/3)
+        volVecs.append([])
         netVecs.append(netVol)
-    print(relVecs)
 
-    vecTot = netVecs[0] + netVecs[1]
+    for n in netVecs: #Summation of vector distance magnitudes (irl/based on unity engine)
+        vecTot += n  
     
-    #Vectors
-    #vec0 = netVecs[0] ** 3
-    x = ((volume * netVecs[0] / vecTot) ** 3 / ((relVecs[0][0])**2 + (relVecs[0][1])**2 + (relVecs[0][2])**2)) ** 0.5
+    m = ((volume * netVecs[i] / vecTot) ** 3 / ((relVecs[i][0])**2 + (relVecs[i][1])**2 + (relVecs[i][2])**2)) ** 0.5 #Multiplier factor for each coordinate
 
-    for i in range(0, 3):
-        volVecs[0].append(relVecs[0][i] * x)
-
-
-    #Vector 1
-    y = ((volume * netVecs[1] / vecTot) ** 3 / ((relVecs[1][0])**2 + (relVecs[1][1])**2 + (relVecs[1][2])**2)) ** 0.5
-    
-    for i in range(0, 3):
-        volVecs[1].append(relVecs[1][i] * y)
-    
+    for i in range(0, len(speakers)): #Goes through all speakers
+        for j in range(0, 3): #Goes through x, y, z
+            volVecs[i].append(relVecs[i][j] * m)
+         
+        
+    #Appending vectors
     totVecs = []
     #Sums up length of vectors
-    for i in range(0, 2):
+    for i in range(0, len(volVecs)):
         totVecs.append(((volVecs[i][0])**2 + (volVecs[i][1])**2 + (volVecs[i][2])**2) ** (1/3))
-        
+    
     return totVecs #Returns volumes of vectors
 
 
